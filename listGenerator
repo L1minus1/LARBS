@@ -1,0 +1,41 @@
+#!/bin/bash
+
+#create temporary environment
+mkdir ~/.pkgsTMP
+
+#generate package list of non-AUR items
+pacman -Qqe | grep -vx "$(pacman -Qmqe)" > ~/.pkgsTMP/pkgs
+	
+	#generate non-AUR desciptions
+	pacman -Qqei | grep -Po '(?<=^Description).*' | sed "s/^\s*: //" | grep -vx "$(pacman -Qmqei | grep -Po '(?<=^Description).*' | sed "s/^\s*: //")" > ~/.pkgsTMP/pkgsDesc
+	sed -i 's/,//g' ~/.pkgsTMP/pkgsDesc
+#generate AUR Package list
+pacman -Qmqe > ~/.pkgsTMP/aur
+	
+	#generate AUR package descriptions
+	(pacman -Qmqei | grep -Po '(?<=^Description).*' | sed "s/^\s*: //") > ~/.pkgsTMP/aurDesc
+	sed -i 's/,//g' ~/.pkgsTMP/aurDesc
+#combine non-AUR files
+paste -d "," ~/.pkgsTMP/pkgs ~/.pkgsTMP/pkgsDesc > ~/.pkgsTMP/pkgsList
+sed -i -e 's/^/,/' ~/.pkgsTMP/pkgsList
+#cat ~/.pkgsTMP/pkgsList
+
+#combine AUR files
+paste -d "," ~/.pkgsTMP/aur ~/.pkgsTMP/aurDesc > ~/.pkgsTMP/aurList
+sed -i -e 's/^/A,/' ~/.pkgsTMP/aurList
+#cat ~/.pkgsTMP/aurList
+
+#compile to CSV
+#---removed heading present in Luke's file--- to revert, re-add it to the empty string below and "~/.pkgsTMP/heading" to the cat below
+#echo "" > ~/.pkgsTMP/heading
+(cat ~/.pkgsTMP/pkgsList ~/.pkgsTMP/aurList) > ~/pkgList.csv
+ 
+#push updated list
+autodfa ~/pkgList.csv 
+/usr/bin/git --git-dir=$HOME/dotfiles.git/ --work-tree=$HOME push > /dev/null 2>&1
+
+#display total packages
+cat ~/.pkgsTMP/pkgs ~/.pkgsTMP/aur | wc -l | tr '\n' ' '
+
+#delete temporary environment
+rm -rf ~/.pkgsTMP
