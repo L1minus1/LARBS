@@ -1,5 +1,15 @@
 # Lumen's Auto-Rice Bootstrapping Scripts (LARBS)
 
+## Key differences from Luke's version
+- listGenerator is the script I use to generate progs.csv.
+  + It is not perfect and may sometimes need manual editing when programs must be installed in a specific order.
+  + It also does not automatically add programs installed from git repos.
+  + AUR packages are supported, but mileage may vary.
+  + If you look near the bottom of the file, you will see a comment about pushing progs.csv to a git repo.  I intentionally left this section blank in this version for you to insert your own method, as I'm sure that I manage my dotfiles differently from you.  This script is usable without it, but you will have to put progs.csv somewhere that larbs.sh can access it.
+- By default this fork pulls from my private dotfiles, you will have to change the $dotfilesrepo and $progsfile variables at the top of larbs.sh.
+- Alternatively, you can simply use the `-r` and `-p` arguments to suit your setup.
+
+ 
 ## Installation:
 
 On an Arch-based distribution as root, run the following:
@@ -20,11 +30,6 @@ LARBS can be run on a fresh install of Arch or Artix Linux, and provides you
 with a fully configured diving-board for work or more customization.
 
 ## Customization
-
-By default, LARBS uses the programs [here in progs.csv](progs.csv) and installs
-[my dotfiles repo (voidrice) here](https://github.com/lukesmithxyz/voidrice),
-but you can easily change this by either modifying the default variables at the
-beginning of the script or giving the script one of these options:
 
 - `-r`: custom dotfiles repository (URL)
 - `-p`: custom programs list/dependencies (local file or URL)
